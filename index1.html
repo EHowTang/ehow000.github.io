@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端三劍客教學範例</title>
+
+    <style>
+        /* 1. 全域設定 */
+        /* 星號 * 代表「選取所有東西」。box-sizing: border-box 是現代網頁必備設定，
+           讓 padding (內距) 不會把盒子撐大，比較好算尺寸。 */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* 2. 標籤選擇器 (Tag Selector) */
+        /* 直接選取 body 標籤，設定整個頁面的背景 */
+        body {
+            /* [背景顏色] 可填變數：
+               1. 英文單字: red, black, white
+               2. 十六進位碼: #000000 (黑), #ffffff (白) -> 你現在最常用的
+               3. RGB/RGBA: rgb(255,0,0) 或 rgba(0,0,0, 0.5) <- 最後一個數字是透明度 0~1 */
+            background-color: #f0f2f5;
+
+            /* [字體] 可填變數：'Arial', '微軟正黑體', sans-serif (無襯線體) */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+            /* [排版 Flexbox] 下面這三行是「萬用置中法」，讓內容在畫面正中間 */
+            display: flex;             /* 開啟彈性排版模式 */
+            justify-content: center;   /* 水平置中 (center, flex-start, flex-end, space-between) */
+            align-items: center;       /* 垂直置中 */
+            height: 100vh;             /* 高度設為 100vh (viewport height)，即視窗高度的 100% */
+            margin: 0;                 /* 去除瀏覽器預設的白邊 */
+        }
+
+        /* 3. 類別選擇器 (Class Selector) */
+        /* 選取所有 class="card" 的元素。這是最常用的寫法，因為 class 可以重複使用 */
+        .card {
+            /* [尺寸] 可填變數：px (像素), % (百分比), rem (相對字體大小) */
+            width: 350px;
+            padding: 30px;  /* 內距：內容離邊框的距離 */
+            
+            background-color: white;
+            
+            /* [邊框與圓角] */
+            border-radius: 15px; /* 圓角程度 */
+            /* box-shadow: 水平位移 垂直位移 模糊半徑 顏色 */
+            box-shadow: 0 10px 25px rgba(0,0,0, 0.1); 
+
+            /* [文字對齊] center, left, right */
+            text-align: center; 
+            
+            /* [過渡動畫] 當樣式改變時(例如變色)，花 0.3秒 平滑變成新的樣子 */
+            transition: transform 0.3s ease; 
+        }
+
+        /* [偽類 Pseudo-class] :hover 代表「滑鼠移上去時」的狀態 */
+        .card:hover {
+            transform: translateY(-10px); /* 往上浮動 10px */
+        }
+
+        /* 4. ID 選擇器 (ID Selector) */
+        /* 選取 id="status-text" 的元素 (權重比 class 高，但一個頁面只能有一個同名 ID) */
+        #status-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px; /* 下方的間距 */
+        }
+
+        /* 按鈕樣式設計 */
+        .btn {
+            /* 去除預設樣式 */
+            border: none;
+            cursor: pointer; /* 滑鼠移上去變手指 */
+            
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff; /* 藍色 */
+            border-radius: 50px; /* 變成膠囊狀 */
+            
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3; /* 滑鼠移上去變深藍 */
+        }
+
+        /* 用於 JavaScript 切換的特殊樣式 */
+        .active-mode {
+            background-color: #222 !important; /* !important 強制覆蓋其他設定 */
+            color: #ccff00 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card" id="myCard">
+        
+        <h1 id="title">Hello World!</h1>
+        
+        <p id="status-text">目前狀態：尚未啟動</p>
+
+        <button class="btn" id="actionBtn">點擊我改變樣式</button>
+
+        <div style="margin-top: 20px; font-size: 12px; color: #aaa;">
+            計數器：<span id="counter">0</span> 次
+        </div>
+    </div>
+
+    <script>
+        // 1. [變數宣告]：先把 HTML 裡面的東西抓出來，存到變數裡
+        // const: 宣告「常數」，存進去後不能換成別的東西 (通常用來存 DOM 元素)
+        // let: 宣告「變數」，數值之後可以改變 (例如計數器)
+        
+        const cardElement = document.getElementById('myCard');     // 抓取 ID 為 myCard 的盒子
+        const titleElement = document.getElementById('title');     // 抓取標題
+        const btnElement = document.getElementById('actionBtn');   // 抓取按鈕
+        const countSpan = document.getElementById('counter');      // 抓取數字
+        const statusText = document.getElementById('status-text');
+
+        let count = 0; // 這是一個數字變數，初始為 0
+        let isCyberpunk = false; // 這是一個布林值 (Boolean)，只有 true(是) 或 false(否)
+
+        // 2. [定義函式 (Function)]：一組要執行的動作
+        function updateCounter() {
+            count = count + 1; // 每次執行就把 count 加 1
+            countSpan.innerText = count; // 把 HTML 裡的文字換成新的數字
+        }
+
+        function toggleStyle() {
+            // 切換模式的邏輯
+            isCyberpunk = !isCyberpunk; // 把 true 變 false，把 false 變 true (反轉)
+
+            if (isCyberpunk) {
+                // [情況 A] 如果是 Cyberpunk 模式
+                
+                // classList.add: 幫元素加上一個 class (套用 CSS)
+                cardElement.classList.add('active-mode'); 
+                
+                // 直接修改文字內容
+                titleElement.innerText = "SYSTEM ONLINE"; 
+                statusText.innerText = "目前狀態：駭客模式啟動";
+                btnElement.innerText = "回復原廠設定";
+                
+                // 直接用 JS 修改 CSS (不推薦寫太多，建議用 class 切換)
+                btnElement.style.backgroundColor = '#ccff00';
+                btnElement.style.color = 'black';
+
+            } else {
+                // [情況 B] 如果不是 Cyberpunk 模式 (回復)
+                
+                // classList.remove: 移除 class
+                cardElement.classList.remove('active-mode');
+                
+                titleElement.innerText = "Hello World!";
+                statusText.innerText = "目前狀態：一般模式";
+                btnElement.innerText = "點擊我改變樣式";
+                
+                // 清除行內樣式，回復到 CSS 檔案裡的設定
+                btnElement.style.backgroundColor = ''; 
+                btnElement.style.color = '';
+            }
+        }
+
+        // 3. [事件監聽 (Event Listener)]：告訴瀏覽器「當發生什麼事，就去做什麼」
+        // 語法：元素.addEventListener('事件類型', 要執行的函式);
+        
+        btnElement.addEventListener('click', function() {
+            // 這裡寫點擊後要發生的事
+            updateCounter(); // 執行計數
+            toggleStyle();   // 執行切換樣式
+        });
+
+        // 你也可以監聽鍵盤事件，例如按下 Enter 鍵
+        document.addEventListener('keydown', function(event) {
+            if(event.key === 'Enter') {
+                alert('你按下了 Enter 鍵！目前計數：' + count);
+            }
+        });
+
+        // 4. Console log (除錯用)
+        // 按 F12 打開開發者工具的 Console 分頁，會看到這行字
+        console.log("程式載入完成，隨時準備戰鬥！");
+
+    </script>
+</body>
+</html>
